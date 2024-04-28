@@ -1,4 +1,4 @@
-# Modified 4/27/2024 as an initial effort to modernize panda3d.ai 
+# Modified 4/27/2024 as an initial effort to modernize panda3d.ai
 
 # This tutorial provides an example of creating a character and having it walk
 # around using PandAI pathfinding with static obstacle avoidance
@@ -16,6 +16,10 @@ from direct.gui.OnscreenText import OnscreenText
 
 from panda3d.ai import *
 import complexpbr
+# import pandarecord
+
+from NavmeshGenerator import *
+import EggPrimitiveCreation
 
 
 base = ShowBase()
@@ -42,6 +46,7 @@ def addTitle(text):
 class World(ShowBase):
     def __init__(self):
         complexpbr.apply_shader(base.render)
+        # pandarecord.setup_sg(base,cust_fr=144,max_screens=10000)
 
         self.keyMap = {"left": 0, "right": 0, "up": 0, "down": 0}
 
@@ -53,7 +58,9 @@ class World(ShowBase):
         addInstructions(0.75, "[2]: Big box")
         addInstructions(0.70, "[Space]: Place box")
 
-        #base.disableMouse()
+        # base.disableMouse()
+        base.accept("f3", self.toggle_wireframe)
+        base.accept("escape", sys.exit, [0])
 
         base.cam.setPosHpr(0, -210, 135, 0, 327, 0)
         self.box = 0
@@ -62,22 +69,12 @@ class World(ShowBase):
         self.setAI()
 
     def loadModels(self):
-        '''
-        self.environ1 = loader.loadModel("models/skydome")
-        self.environ1.reparentTo(render)
-        self.environ1.setScale(1)
-        self.environ2 = loader.loadModel("models/skydome")
-        self.environ2.reparentTo(render)
-        self.environ2.setP(180)
-        self.environ2.setH(270)
-        self.environ2.setScale(1)
-        '''
         self.environ = loader.loadModel("models/arena_1.bam")
         self.environ.reparentTo(render)
 
         # Create the main character, Ralph
-        #ralphStartPos = self.environ.find("**/start_point").getPos()
-        ralphStartPos = Vec3(-51, -64, 0)
+        # ralphStartPos = self.environ.find("**/start_point").getPos()
+        ralphStartPos = Vec3(-20, -15, 0)
 
         self.ralph = Actor("models/ralph",
                            {"run": "models/ralph-run",
@@ -117,11 +114,24 @@ class World(ShowBase):
         self.AIbehaviors = self.AIchar.getAiBehaviors()
         
         # the following commented-out line loads in a "navmesh"
-        # .csv file generated presumably from a very outdated
-        # 3D model program exporter originally used during
-        # original pandai development
-        # self.AIbehaviors.initPathFind("models/navmesh.csv")
-        self.AIbehaviors.initPathFind("models/arena_1.bam")
+        # .csv file generated using an .egg primitive created
+        # on the fly with built-in panda3d functions and some
+        # boutique PandAI specific formatting for the 2D A*
+        prim_1_name = "wedge"  # this is the navmesh primitive
+        prim_2_name = "wedge_coll"  # this is a copy of the navmesh primitive
+        # we begin by making two meshes, one "full" and one "coll"
+        # in order to build the 2D navigation mesh from .egg files
+        primitive_data_1 = EggPrimitiveCreation.make_wedge(evp_name = "full")
+        primitive_data_2 = EggPrimitiveCreation.make_wedge(evp_name = "coll")
+        primitive_data_1.write_egg(Filename(prim_1_name + ".egg"))
+        primitive_data_2.write_egg(Filename(prim_2_name + ".egg"))
+
+        # now we'll take these .egg files generated on the fly
+        # and convert them to the 2D A* pathfinding system
+        navmesh = NavmeshGenerator(prim_1_name + ".egg", prim_2_name + ".egg")
+        # the navmesh has now been automatically created
+        # and we can add it to the PandaAI init_path_find()
+        self.AIbehaviors.init_path_find("navmesh.csv")
 
         # AI World update
         taskMgr.add(self.AIUpdate, "AIUpdate")
