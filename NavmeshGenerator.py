@@ -4,7 +4,7 @@ from math import sqrt
 import sys
 
  
-class NavmeshGenerator():
+class NavMeshGenerator():
     def __init__(self, prim_1_name, prim_2_name):
         #initialize lists
         self.oldList = []
@@ -51,7 +51,7 @@ class NavmeshGenerator():
         self.writeToCSV()
     
     # Iterates through the Egg file and
-    # extract all the quads and store them
+    # extracts all the quads and stores them
     # as nodes
     def iterateEggPoly(self, egg, type): 
       # Create a node for each quad
@@ -133,7 +133,7 @@ class NavmeshGenerator():
          for c in range(int(sqrt(self.nodeCount))):
             self.setNeighbors(self.finalList[r][c], r, c)
  
-    # This writes the grid in the correct format to the csv
+    # Writes the grid in the correct format to the .csv
     def writeToCSV(self):
         file = open('navmesh.csv', 'wb')
         

@@ -3,7 +3,7 @@ from panda3d.egg import EggPolygon, EggGroup, EggVertexPool, EggData, EggVertex,
 import math
 
 
-def makeWedge(angleDegrees = 360, numSteps = 16, evp_name = 'fan'):
+def makeWedge(angleDegrees = 360, numSteps = 16, scale = 1, evp_name = 'fan'):
     z_up = EggCoordinateSystem()
     z_up.setValue(CSZupRight)
 
@@ -24,10 +24,10 @@ def makeWedge(angleDegrees = 360, numSteps = 16, evp_name = 'fan'):
 
     angleRadians = deg2Rad(angleDegrees)
 
-    for i in range(numSteps):
+    for i in range(numSteps + 1):
         a = angleRadians * i / numSteps
-        y = math.sin(a)
-        x = math.cos(a)
+        y = math.sin(a) * scale
+        x = math.cos(a) * scale
 
         v = EggVertex()
         v.setPos(Point3D(x, 0, y))

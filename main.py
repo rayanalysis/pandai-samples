@@ -18,7 +18,7 @@ from panda3d.ai import *
 import complexpbr
 # import pandarecord
 
-from NavmeshGenerator import *
+from NavMeshGenerator import *
 import EggPrimitiveCreation
 
 
@@ -57,9 +57,10 @@ class World(ShowBase):
         addInstructions(0.80, "[1]: Small box")
         addInstructions(0.75, "[2]: Big box")
         addInstructions(0.70, "[Space]: Place box")
+        addInstructions(0.65, "[F3]: Toggle Wireframe")
 
         # base.disableMouse()
-        base.accept("f3", self.toggle_wireframe)
+        base.accept("f3", base.toggleWireframe)
         base.accept("escape", sys.exit, [0])
 
         base.cam.setPosHpr(0, -210, 135, 0, 327, 0)
@@ -121,14 +122,14 @@ class World(ShowBase):
         prim_2_name = "wedge_coll"  # this is a copy of the navmesh primitive
         # we begin by making two meshes, one "Full" and one "Coll"
         # in order to build the 2D navigation mesh from .egg files
-        primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 64, "Full")
-        primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 64, "Coll")
+        primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 64, 100, "Full")
+        primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 64, 100, "Coll")
         primitive_data_1.writeEgg(Filename(prim_1_name + ".egg"))
         primitive_data_2.writeEgg(Filename(prim_2_name + ".egg"))
 
         # now we'll take these .egg files generated on the fly
         # and convert them to the 2D A* pathfinding system
-        navmesh = NavmeshGenerator(prim_1_name + ".egg", prim_2_name + ".egg")
+        navmesh = NavMeshGenerator(prim_1_name + ".egg", prim_2_name + ".egg")
         # the navmesh has now been automatically created
         # and we can add it to the PandaAI init_path_find()
         self.AIbehaviors.initPathFind("navmesh.csv")
@@ -136,6 +137,7 @@ class World(ShowBase):
         # visually verify generated .egg files
         egg_1 = loader.loadModel(prim_1_name + ".egg")
         egg_1.reparentTo(base.render)
+        egg_1.setShaderOff()
 
         # AI World update
         taskMgr.add(self.AIUpdate, "AIUpdate")
