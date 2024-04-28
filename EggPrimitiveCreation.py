@@ -1,13 +1,15 @@
 from panda3d.core import Point3D, deg2Rad, NodePath, Filename, CSZupRight
-from panda3d.egg import EggPolygon, EggGroupNode, EggVertexPool, EggData, EggVertex, loadEggData, EggCoordinateSystem
+from panda3d.egg import EggPolygon, EggGroup, EggVertexPool, EggData, EggVertex, loadEggData, EggCoordinateSystem
 import math
 
 
-def make_wedge(angleDegrees = 360, numSteps = 16, evp_name = 'fan'):
+def makeWedge(angleDegrees = 360, numSteps = 16, evp_name = 'fan'):
     z_up = EggCoordinateSystem()
     z_up.setValue(CSZupRight)
 
+    dataGroup = EggGroup()
     data = EggData()
+    dataGroup.addChild(data)
     data.addChild(z_up)
 
     vp = EggVertexPool(evp_name)
@@ -22,7 +24,7 @@ def make_wedge(angleDegrees = 360, numSteps = 16, evp_name = 'fan'):
 
     angleRadians = deg2Rad(angleDegrees)
 
-    for i in range(numSteps + 1):
+    for i in range(numSteps):
         a = angleRadians * i / numSteps
         y = math.sin(a)
         x = math.cos(a)

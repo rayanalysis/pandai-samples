@@ -113,25 +113,29 @@ class World(ShowBase):
         self.AIworld.addAiChar(self.AIchar)
         self.AIbehaviors = self.AIchar.getAiBehaviors()
         
-        # the following commented-out line loads in a "navmesh"
-        # .csv file generated using an .egg primitive created
-        # on the fly with built-in panda3d functions and some
-        # boutique PandAI specific formatting for the 2D A*
+        # the following loads in a "navmesh" .csv file
+        # generated using an .egg primitive created on the fly
+        # with built-in panda3d functions and some boutique
+        # PandAI specific formatting for the 2D A* system
         prim_1_name = "wedge"  # this is the navmesh primitive
         prim_2_name = "wedge_coll"  # this is a copy of the navmesh primitive
-        # we begin by making two meshes, one "full" and one "coll"
+        # we begin by making two meshes, one "Full" and one "Coll"
         # in order to build the 2D navigation mesh from .egg files
-        primitive_data_1 = EggPrimitiveCreation.make_wedge(evp_name = "full")
-        primitive_data_2 = EggPrimitiveCreation.make_wedge(evp_name = "coll")
-        primitive_data_1.write_egg(Filename(prim_1_name + ".egg"))
-        primitive_data_2.write_egg(Filename(prim_2_name + ".egg"))
+        primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 64, "Full")
+        primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 64, "Coll")
+        primitive_data_1.writeEgg(Filename(prim_1_name + ".egg"))
+        primitive_data_2.writeEgg(Filename(prim_2_name + ".egg"))
 
         # now we'll take these .egg files generated on the fly
         # and convert them to the 2D A* pathfinding system
         navmesh = NavmeshGenerator(prim_1_name + ".egg", prim_2_name + ".egg")
         # the navmesh has now been automatically created
         # and we can add it to the PandaAI init_path_find()
-        self.AIbehaviors.init_path_find("navmesh.csv")
+        self.AIbehaviors.initPathFind("navmesh.csv")
+
+        # visually verify generated .egg files
+        egg_1 = loader.loadModel(prim_1_name + ".egg")
+        egg_1.reparentTo(base.render)
 
         # AI World update
         taskMgr.add(self.AIUpdate, "AIUpdate")

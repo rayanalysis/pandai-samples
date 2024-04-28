@@ -2,6 +2,7 @@ from panda3d.egg import EggPolygon, EggGroupNode, EggVertexPool, EggData, EggVer
 from GridNode import *
 from math import sqrt
 import sys
+
  
 class NavmeshGenerator():
     def __init__(self, prim_1_name, prim_2_name):
@@ -24,12 +25,12 @@ class NavmeshGenerator():
         self.egg = EggData()
         self.fname = prim_1_name
         self.egg.resolveEggFilename(self.fname) 
-        self.egg.read(self.fname, "full")
+        self.egg.read(self.fname, "Full")
         
         self.eggColl = EggData()
         self.cname = prim_2_name
         self.eggColl.resolveEggFilename(self.cname) 
-        self.eggColl.read(self.cname, "coll")
+        self.eggColl.read(self.cname, "Coll")
         
         print("Creating full node list...")
         self.iterateEggPoly(self.egg, "Full")
@@ -201,10 +202,7 @@ class NavmeshGenerator():
                         file.write(b'0')                    
                         
                     file.write(b'\n')
-                    
-                
-              
- 
+
     ## HELPER FUNCTIONS 
     
     # Helper function which finds collisions
