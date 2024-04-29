@@ -125,8 +125,8 @@ class World(ShowBase):
         # in order to build the 2D navigation mesh from .egg files
         # primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Full", 30)
         # primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Coll", 30)
-        primitive_data_1 = EggPrimitiveCreation.makeSquares(10, 10, 10, "Full")
-        primitive_data_2 = EggPrimitiveCreation.makeSquares(10, 10, 10, "Coll")
+        primitive_data_1 = EggPrimitiveCreation.makeSquaresEVP(30, 30, 10, "Full")
+        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVP(30, 30, 10, "Coll")
         primitive_data_1.writeEgg(Filename(prim_1_name + ".egg"))
         primitive_data_2.writeEgg(Filename(prim_2_name + ".egg"))
 

@@ -96,8 +96,11 @@ class NavMeshGenerator():
             for c in range(int(sqrt(self.nodeCount))-1): #sqrt
                 # Processing next col
                 for i in range(self.nodeCount):
-                    if currentColNode.vertex[self.rightVertex] == self.oldList[i].vertex[self.lowestVertex] and currentColNode.vertex[self.toprightVertex] == self.oldList[i].vertex[self.topVertex]:
-                            nextColNode = self.oldList[i]
+                    try:
+                        if currentColNode.vertex[self.rightVertex] == self.oldList[i].vertex[self.lowestVertex] and currentColNode.vertex[self.toprightVertex] == self.oldList[i].vertex[self.topVertex]:
+                                nextColNode = self.oldList[i]
+                    except:
+                        pass
                 self.newList.append(nextColNode)
                 currentColNode = nextColNode
 
@@ -107,8 +110,11 @@ class NavMeshGenerator():
             
             nextRowNode = None
             for i in range(self.nodeCount):
-                if currentRowNode.vertex[self.toprightVertex] == self.oldList[i].vertex[self.rightVertex] and currentRowNode.vertex[self.topVertex] == self.oldList[i].vertex[self.lowestVertex]:
-                    nextRowNode = self.oldList[i]
+                try:
+                    if currentRowNode.vertex[self.toprightVertex] == self.oldList[i].vertex[self.rightVertex] and currentRowNode.vertex[self.topVertex] == self.oldList[i].vertex[self.lowestVertex]:
+                        nextRowNode = self.oldList[i]
+                except:
+                    pass
             self.newList.append(nextRowNode)
             currentRowNode = nextRowNode
             currentColNode = nextRowNode
@@ -208,8 +214,11 @@ class NavMeshGenerator():
     # Helper function which finds collisions
     def CollContains(self, chkNode):
         for node in self.oldCollList:
-            if node.vertex == chkNode.vertex:
-                return True
+            try:
+                if node.vertex == chkNode.vertex:
+                    return True
+            except:
+                pass
             
         return False
     
