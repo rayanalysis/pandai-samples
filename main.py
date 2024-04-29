@@ -64,6 +64,7 @@ class World(ShowBase):
         base.accept("escape", sys.exit, [0])
 
         base.cam.setPosHpr(0, -210, 135, 0, 327, 0)
+        # base.cam.setPosHpr(0, -30, 30, 0, 327, 0)
         self.box = 0
         self.pointer_move = False
         self.loadModels()
@@ -75,7 +76,7 @@ class World(ShowBase):
 
         # Create the main character, Ralph
         # ralphStartPos = self.environ.find("**/start_point").getPos()
-        ralphStartPos = Vec3(-20, -15, 0)
+        ralphStartPos = Vec3(20, 15, 0)
 
         self.ralph = Actor("models/ralph",
                            {"run": "models/ralph-run",
@@ -118,12 +119,14 @@ class World(ShowBase):
         # generated using an .egg primitive created on the fly
         # with built-in panda3d functions and some boutique
         # PandAI specific formatting for the 2D A* system
-        prim_1_name = "wedge"  # this is the navmesh primitive
-        prim_2_name = "wedge_coll"  # this is a copy of the navmesh primitive
+        prim_1_name = "squares"  # this is the navmesh primitive
+        prim_2_name = "squares_coll"  # this is a copy of the navmesh primitive
         # we begin by making two meshes, one "Full" and one "Coll"
         # in order to build the 2D navigation mesh from .egg files
-        primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 64, 100, "Full")
-        primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 64, 100, "Coll")
+        # primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Full", 30)
+        # primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Coll", 30)
+        primitive_data_1 = EggPrimitiveCreation.makeSquares(10, 10, 10, "Full")
+        primitive_data_2 = EggPrimitiveCreation.makeSquares(10, 10, 10, "Coll")
         primitive_data_1.writeEgg(Filename(prim_1_name + ".egg"))
         primitive_data_2.writeEgg(Filename(prim_2_name + ".egg"))
 
@@ -131,8 +134,10 @@ class World(ShowBase):
         # and convert them to the 2D A* pathfinding system
         navmesh = NavMeshGenerator(prim_1_name + ".egg", prim_2_name + ".egg")
         # the navmesh has now been automatically created
-        # and we can add it to the PandaAI init_path_find()
+        # and we can add it to the PandAI init_path_find()
+        
         self.AIbehaviors.initPathFind("navmesh.csv")
+        # self.AIbehaviors.initPathFind("models/navmesh.csv")
 
         # visually verify generated .egg files
         egg_1 = loader.loadModel(prim_1_name + ".egg")
@@ -146,16 +151,16 @@ class World(ShowBase):
         taskMgr.add(self.Mover, "Mover")
 
         slight_1 = Spotlight('slight_1')
-        slight_1.set_color(Vec4(Vec3(5),1))
-        slight_1.set_shadow_caster(True, 4096, 4096)
+        slight_1.setColor(Vec4(Vec3(5),1))
+        slight_1.setShadowCaster(True, 4096, 4096)
         # slight_1.set_attenuation((0.5,0,0.000005))
         lens = PerspectiveLens()
-        slight_1.set_lens(lens)
-        slight_1.get_lens().set_fov(120)
-        slight_1_node = base.render.attach_new_node(slight_1)
-        slight_1_node.set_pos(50, 50, 90)
-        slight_1_node.look_at(0,0,0.5)
-        base.render.set_light(slight_1_node)
+        slight_1.setLens(lens)
+        slight_1.getLens().setFov(120)
+        slight_1_node = base.render.attachNewNode(slight_1)
+        slight_1_node.setPos(50, 50, 90)
+        slight_1_node.lookAt(0,0,0.5)
+        base.render.setLight(slight_1_node)
 
     def setMove(self):
         self.AIbehaviors.pathFindTo(self.pointer)
