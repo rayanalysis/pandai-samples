@@ -166,7 +166,7 @@ class NavMeshGenerator():
                 # Grid Y
                 file.write(bytes(str(str(node.c) + ','), 'utf-8'))
                 # Length
-                file.write(bytes(str(str(round(node.vertex[0].getX() - node.vertex[1].getX(), 4)) + ','), 'utf-8'))
+                file.write(bytes(str(str(round(abs(node.vertex[0].getX() - node.vertex[1].getX()), 4)) + ','), 'utf-8'))
                 # Width
                 file.write(bytes(str(str(round(node.vertex[0].getZ() - node.vertex[3].getZ(), 4)) + ','), 'utf-8'))
                 # Height
@@ -195,7 +195,7 @@ class NavMeshGenerator():
                         # Grid Y
                         file.write(bytes(str(str(nnode.c) + ','), 'utf-8'))
                         # Length
-                        file.write(bytes(str(str(round(nnode.vertex[0].getX() - nnode.vertex[1].getX(), 4)) + ','), 'utf-8'))
+                        file.write(bytes(str(str(round(abs(nnode.vertex[0].getX() - nnode.vertex[1].getX()), 4)) + ','), 'utf-8'))
                         # Width
                         file.write(bytes(str(round(nnode.vertex[0].getZ() - nnode.vertex[3].getZ(), 4)) + ',', 'utf-8'))
                         # Height
@@ -276,12 +276,6 @@ class NavMeshGenerator():
                 x2 = float(int(node.vertex[i].getX()*precision)/precision)
                 z1 = float(int(node.vertex[self.lowestVertex].getZ()*precision)/precision)
                 z2 = float(int(node.vertex[i].getZ()*precision)/precision)
-
-                # self.rightVertex fails for y values other than 0 in the input mesh
-                # so we'll initialize it at 0 before the check
-                self.rightVertex = 0
-                self.toprightVertex = 0
-                self.topVertex = 0
 
                 if x1 == x2 and z1 < z2:
                     self.topVertex = i

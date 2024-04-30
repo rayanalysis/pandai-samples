@@ -24,11 +24,6 @@ import EggPrimitiveCreation
 
 base = ShowBase()
 speed = 0.75
-
-# Figure out what directory this program is in.
-# MYDIR = os.path.abspath(sys.path[0])
-# MYDIR = Filename.fromOsSpecific(MYDIR).getFullpath()
-
 font = loader.loadFont("cmss12")
 
 
@@ -76,7 +71,7 @@ class World(ShowBase):
 
         # Create the main character, Ralph
         # ralphStartPos = self.environ.find("**/start_point").getPos()
-        ralphStartPos = Vec3(20, 15, 0)
+        ralphStartPos = Vec3(30, 30, 0)
 
         self.ralph = Actor("models/ralph",
                            {"run": "models/ralph-run",
@@ -88,7 +83,7 @@ class World(ShowBase):
 
         self.pointer = loader.loadModel("models/1m_sphere_black_marble.bam")
         self.pointer.setColor(1, 0, 0)
-        self.pointer.setPos(60, -60, 0)
+        self.pointer.setPos(25, 25, 0)
         self.pointer.setScale(3)
         self.pointer.reparentTo(render)
 
@@ -125,8 +120,8 @@ class World(ShowBase):
         # in order to build the 2D navigation mesh from .egg files
         # primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Full", 30)
         # primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Coll", 30)
-        primitive_data_1 = EggPrimitiveCreation.makeSquaresEVP(30, 30, 10, "Full")
-        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVP(30, 30, 10, "Coll")
+        primitive_data_1 = EggPrimitiveCreation.makeSquaresEVPXZ(30, 30, 10, "Full",0)
+        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZSparse(30, 30, 10, "Coll",0)
         primitive_data_1.writeEgg(Filename(prim_1_name + ".egg"))
         primitive_data_2.writeEgg(Filename(prim_2_name + ".egg"))
 
@@ -140,7 +135,7 @@ class World(ShowBase):
         # self.AIbehaviors.initPathFind("models/navmesh.csv")
 
         # visually verify generated .egg files
-        egg_1 = loader.loadModel(prim_1_name + ".egg")
+        egg_1 = loader.loadModel(prim_2_name + ".egg")
         egg_1.reparentTo(base.render)
         egg_1.setShaderOff()
 
