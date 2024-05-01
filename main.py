@@ -51,29 +51,30 @@ class World(ShowBase):
         addInstructions(0.95, "[ESC]: Quit")
         addInstructions(0.90, "[Enter]: Start Pathfinding")
         addInstructions(0.85, "[Arrow Keys]: Move Arrow")
-        addInstructions(0.80, "[1]: Small box")
-        addInstructions(0.75, "[2]: Big box")
-        addInstructions(0.70, "[Space]: Place box")
+        addInstructions(0.80, "[1]: Add Small Sphere")
+        addInstructions(0.75, "[2]: Add Large Sphere")
         addInstructions(0.65, "[F3]: Toggle Wireframe")
 
         # base.disableMouse()
         base.accept("f3", base.toggleWireframe)
         base.accept("escape", sys.exit, [0])
 
-        base.cam.setPosHpr(0, -210, 135, 0, 327, 0)
+        base.cam.setPos(0,-200,150)
+        base.cam.lookAt(100,100,0)
         # base.cam.setPosHpr(0, -30, 30, 0, 327, 0)
-        self.box = 0
+        self.box = loader.loadModel("models/1m_sphere_black_marble.bam")
         self.pointer_move = False
         self.loadModels()
         self.setAI()
 
     def loadModels(self):
         self.environ = loader.loadModel("models/arena_1.bam")
+        self.environ.setPos(100,100,0)
         self.environ.reparentTo(render)
 
         # Create the main character, Ralph
         # ralphStartPos = self.environ.find("**/start_point").getPos()
-        ralphStartPos = Vec3(30, 30, 0)
+        ralphStartPos = Vec3(110, 110, 0)
 
         self.ralph = Actor("models/ralph",
                            {"run": "models/ralph-run",
@@ -85,7 +86,7 @@ class World(ShowBase):
 
         self.pointer = loader.loadModel("models/1m_sphere_black_marble.bam")
         self.pointer.setColor(1, 0, 0)
-        self.pointer.setPos(35, 35, 0)
+        self.pointer.setPos(100, 100, 0)
         self.pointer.setScale(3)
         self.pointer.reparentTo(render)
 
@@ -96,7 +97,7 @@ class World(ShowBase):
         self.accept("enter", self.setMove)
         self.accept("1", self.addBlock)
         self.accept("2", self.addBigBlock)
-        self.accept("space", self.addStaticObstacle)
+        # self.accept("space", self.addStaticObstacle)
 
         # Movement
         self.accept("arrow_left", self.setKey, ["left", 1])
@@ -123,7 +124,7 @@ class World(ShowBase):
         # primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Full", 30)
         # primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Coll", 30)
         primitive_data_1 = EggPrimitiveCreation.makeSquaresEVPXZ(30, 30, 10, "Full",0)
-        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZ(16, 16, 10, "Coll",0)
+        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZ(20, 20, 10, "Coll",0)
         # primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZSparse(30, 30, 10, "Coll",0)
         primitive_data_1.writeEgg(Filename(prim_1_name + ".egg"))
         primitive_data_2.writeEgg(Filename(prim_2_name + ".egg"))
@@ -156,8 +157,8 @@ class World(ShowBase):
         slight_1.setLens(lens)
         slight_1.getLens().setFov(120)
         slight_1_node = base.render.attachNewNode(slight_1)
-        slight_1_node.setPos(50, 50, 90)
-        slight_1_node.lookAt(0,0,0.5)
+        slight_1_node.setPos(0, 0, 90)
+        slight_1_node.lookAt(100,100,0.5)
         base.render.setLight(slight_1_node)
 
     def setMove(self):
@@ -167,25 +168,18 @@ class World(ShowBase):
         self.ralph.loop("run")
 
     def addBlock(self):
-        self.pointer_move = True
-        self.box = loader.loadModel("models/1m_sphere_black_marble.bam")
-        self.box.setPos(0, -60, 0)
-        self.box.setScale(1)
-        self.box.reparentTo(render)
+        new_box = loader.loadModel("models/1m_sphere_black_marble.bam")
+        new_box.setPos(self.pointer.getPos())
+        new_box.setScale(2)
+        new_box.reparentTo(render)
+        self.AIbehaviors.addStaticObstacle(new_box)
 
     def addBigBlock(self):
-        self.pointer_move = True
-        self.box = loader.loadModel("models/1m_sphere_black_marble.bam")
-        self.box.setPos(0, -60, 0)
-        self.box.setScale(2)
-        self.box.setColor(1, 1, 0)
-        self.box.reparentTo(render)
-
-    def addStaticObstacle(self):
-        if self.box != 0:
-            self.AIbehaviors.addStaticObstacle(self.box)
-            self.box = 0
-            self.pointer_move = False
+        new_box = loader.loadModel("models/1m_sphere_black_marble.bam")
+        new_box.setPos(self.pointer.getPos())
+        new_box.setScale(4)
+        new_box.reparentTo(render)
+        self.AIbehaviors.addStaticObstacle(new_box)
 
     # To update the AIWorld
     def AIUpdate(self, task):
