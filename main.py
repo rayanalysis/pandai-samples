@@ -21,6 +21,8 @@ import complexpbr
 from NavMeshGenerator import *
 import EggPrimitiveCreation
 
+import random
+
 
 base = ShowBase()
 speed = 0.75
@@ -83,7 +85,7 @@ class World(ShowBase):
 
         self.pointer = loader.loadModel("models/1m_sphere_black_marble.bam")
         self.pointer.setColor(1, 0, 0)
-        self.pointer.setPos(25, 25, 0)
+        self.pointer.setPos(35, 35, 0)
         self.pointer.setScale(3)
         self.pointer.reparentTo(render)
 
@@ -121,7 +123,8 @@ class World(ShowBase):
         # primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Full", 30)
         # primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Coll", 30)
         primitive_data_1 = EggPrimitiveCreation.makeSquaresEVPXZ(30, 30, 10, "Full",0)
-        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZSparse(30, 30, 10, "Coll",0)
+        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZ(16, 16, 10, "Coll",0)
+        # primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZSparse(30, 30, 10, "Coll",0)
         primitive_data_1.writeEgg(Filename(prim_1_name + ".egg"))
         primitive_data_2.writeEgg(Filename(prim_2_name + ".egg"))
 
@@ -135,9 +138,9 @@ class World(ShowBase):
         # self.AIbehaviors.initPathFind("models/navmesh.csv")
 
         # visually verify generated .egg files
-        egg_1 = loader.loadModel(prim_2_name + ".egg")
-        egg_1.reparentTo(base.render)
-        egg_1.setShaderOff()
+        # egg_1 = loader.loadModel(prim_2_name + ".egg")
+        # egg_1.reparentTo(base.render)
+        # egg_1.setShaderOff()
 
         # AI World update
         taskMgr.add(self.AIUpdate, "AIUpdate")
@@ -158,7 +161,9 @@ class World(ShowBase):
         base.render.setLight(slight_1_node)
 
     def setMove(self):
+        # self.AIbehaviors.pathFindTo(LVecBase3(random.randint(-200,200),random.randint(-200,200),0))
         self.AIbehaviors.pathFindTo(self.pointer)
+        # self.AIbehaviors.seek(self.pointer)
         self.ralph.loop("run")
 
     def addBlock(self):

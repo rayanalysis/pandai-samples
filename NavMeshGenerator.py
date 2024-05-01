@@ -168,7 +168,7 @@ class NavMeshGenerator():
                 # Length
                 file.write(bytes(str(str(round(abs(node.vertex[0].getX() - node.vertex[1].getX()), 4)) + ','), 'utf-8'))
                 # Width
-                file.write(bytes(str(str(round(node.vertex[0].getZ() - node.vertex[3].getZ(), 4)) + ','), 'utf-8'))
+                file.write(bytes(str(str(round(abs(node.vertex[0].getZ() - node.vertex[3].getZ()), 4)) + ','), 'utf-8'))
                 # Height
                 file.write(bytes(str('0' + ',' ), 'utf-8'))
                 # PosX
