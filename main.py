@@ -15,19 +15,26 @@ from direct.gui.DirectGui import *
 from direct.gui.OnscreenText import OnscreenText
 
 from panda3d.ai import *
-import complexpbr
-# import pandarecord
-
 from NavMeshGenerator import *
 import EggPrimitiveCreation
 
-import random
+import complexpbr
+# import pandarecord
+
+
+load_prc_file_data("", """
+    win-size 1280 720
+    window-title PandAI Pathfinding Demo
+    framebuffer-multisample 1
+    multisamples 4
+    hardware-animated-vertices #t
+    cursor-hidden #t
+""")
 
 
 base = ShowBase()
 speed = 0.75
 font = loader.loadFont("cmss12")
-
 
 # Function to put instructions on the screen.
 def addInstructions(pos, msg):
@@ -43,11 +50,12 @@ def addTitle(text):
 class World(ShowBase):
     def __init__(self):
         complexpbr.apply_shader(base.render)
-        # pandarecord.setup_sg(base,cust_fr=144,max_screens=10000)
+        complexpbr.screenspace_init()
+        # pandarecord.setup_sg(base,buff_hw=[1280,720],cust_fr=60,RAM_mode=True)
 
         self.keyMap = {"left": 0, "right": 0, "up": 0, "down": 0}
 
-        addTitle("Pandai Tutorial: Adding Dynamic Obstacles")
+        addTitle("PandAI Tutorial: Adding Dynamic Obstacles")
         addInstructions(0.95, "[ESC]: Quit")
         addInstructions(0.90, "[Enter]: Start Pathfinding")
         addInstructions(0.85, "[Arrow Keys]: Move Arrow")
@@ -59,7 +67,7 @@ class World(ShowBase):
         base.accept("f3", base.toggleWireframe)
         base.accept("escape", sys.exit, [0])
 
-        base.cam.setPos(0,-200,150)
+        base.cam.setPos(0,-175,125)
         base.cam.lookAt(100,100,0)
         # base.cam.setPosHpr(0, -30, 30, 0, 327, 0)
         self.box = loader.loadModel("models/1m_sphere_black_marble.bam")
@@ -160,7 +168,7 @@ class World(ShowBase):
         slight_1_node.setPos(0, 0, 90)
         slight_1_node.lookAt(100,100,0.5)
         base.render.setLight(slight_1_node)
-
+        
     def setMove(self):
         # self.AIbehaviors.pathFindTo(LVecBase3(random.randint(-200,200),random.randint(-200,200),0))
         self.AIbehaviors.pathFindTo(self.pointer)
@@ -170,14 +178,14 @@ class World(ShowBase):
     def addBlock(self):
         new_box = loader.loadModel("models/1m_sphere_black_marble.bam")
         new_box.setPos(self.pointer.getPos())
-        new_box.setScale(2)
+        new_box.setScale(4)
         new_box.reparentTo(render)
         self.AIbehaviors.addStaticObstacle(new_box)
 
     def addBigBlock(self):
         new_box = loader.loadModel("models/1m_sphere_black_marble.bam")
         new_box.setPos(self.pointer.getPos())
-        new_box.setScale(4)
+        new_box.setScale(8)
         new_box.reparentTo(render)
         self.AIbehaviors.addStaticObstacle(new_box)
 
