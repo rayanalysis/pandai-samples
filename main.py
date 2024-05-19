@@ -49,13 +49,13 @@ def addTitle(text):
 
 class World(ShowBase):
     def __init__(self):
-        complexpbr.apply_shader(base.render)
+        complexpbr.apply_shader(render)
         complexpbr.screenspace_init()
         # pandarecord.setup_sg(base,buff_hw=[1280,720],cust_fr=60,RAM_mode=True)
 
         self.keyMap = {"left": 0, "right": 0, "up": 0, "down": 0}
 
-        addTitle("PandAI Tutorial: Adding Dynamic Obstacles")
+        addTitle("PandAI Tutorial: Adding Dynamic Obstacles Over Terrain")
         addInstructions(0.95, "[ESC]: Quit")
         addInstructions(0.90, "[Enter]: Start Pathfinding")
         addInstructions(0.85, "[Arrow Keys]: Move Arrow")
@@ -66,6 +66,7 @@ class World(ShowBase):
         # base.disableMouse()
         base.accept("f3", base.toggleWireframe)
         base.accept("escape", sys.exit, [0])
+        self.accept("p", self.activateCam)
 
         base.cam.setPos(0,-175,125)
         base.cam.lookAt(100,100,0)
@@ -73,16 +74,67 @@ class World(ShowBase):
         self.box = loader.loadModel("models/1m_sphere_black_marble.bam")
         self.pointer_move = False
         self.loadModels()
+
+        # create built-in collision from loaded model
+        EggPrimitiveCreation.makeCollisionModel("environ_1.bam", 0)
+
+        # Movement task
+        self.path_no = 1
+        taskMgr.add(self.Mover, "Mover")
+        # taskMgr.add(self.updateRalphZ, "UpdateRalphZ")
+        
+        self.isMoving = False
+        self.cTrav = CollisionTraverser()
+
+        self.ralphGroundRay = CollisionRay()
+        self.ralphGroundRay.setOrigin(0,0,1000)
+        self.ralphGroundRay.setDirection(0,0,-1)
+        self.ralphGroundCol = CollisionNode('ralphRay')
+        self.ralphGroundCol.addSolid(self.ralphGroundRay)
+        self.ralphGroundCol.setFromCollideMask(BitMask32.bit(0))
+        self.ralphGroundCol.setIntoCollideMask(BitMask32.allOff())
+        self.ralphGroundColNp = self.ralph.attachNewNode(self.ralphGroundCol)
+        self.ralphGroundHandler = CollisionHandlerQueue()
+        self.cTrav.addCollider(self.ralphGroundColNp, self.ralphGroundHandler)
+
+        self.camGroundRay = CollisionRay()
+        self.camGroundRay.setOrigin(0,0,1000)
+        self.camGroundRay.setDirection(0,0,-1)
+        self.camGroundCol = CollisionNode('camRay')
+        self.camGroundCol.addSolid(self.camGroundRay)
+        self.camGroundCol.setFromCollideMask(BitMask32.bit(0))
+        self.camGroundCol.setIntoCollideMask(BitMask32.allOff())
+        self.camGroundColNp = base.camera.attachNewNode(self.camGroundCol)
+        self.camGroundHandler = CollisionHandlerQueue()
+        self.cTrav.addCollider(self.camGroundColNp, self.camGroundHandler)
+
+        # Uncomment this line to see the collision rays
+        self.ralphGroundColNp.show()
+        self.camGroundColNp.show()
+       
+        # Uncomment this line to show a visual representation of the 
+        # collisions occuring
+        self.cTrav.showCollisions(render)
+
         self.setAI()
 
+    def activateCam(self):
+        base.cam.setPosHpr(0,0,0,0,0,0)
+        base.cam.reparentTo(self.ralph)
+        base.cam.setY(base.cam.getY() + 30)
+        base.cam.setZ(base.cam.getZ() + 10)
+        base.cam.setHpr(180,-15,0)
+
     def loadModels(self):
-        self.environ = loader.loadModel("models/arena_1.bam")
-        self.environ.setPos(100,100,0)
-        self.environ.reparentTo(render)
+        # self.environ = loader.loadModel("models/arena_1.bam")
+        # self.environ.setPos(100,100,0)
+        # self.environ.reparentTo(render)
+        self.environ = loader.load_model("models/builtin_test.glb")
+        self.environ.write_bam_file("environ_1.bam")
 
         # Create the main character, Ralph
         # ralphStartPos = self.environ.find("**/start_point").getPos()
-        ralphStartPos = Vec3(110, 110, 0)
+        ralphStartPos = Vec3(20, 20, 0)
 
         self.ralph = Actor("models/ralph",
                            {"run": "models/ralph-run",
@@ -120,7 +172,7 @@ class World(ShowBase):
         self.AIchar = AICharacter("ralph", self.ralph, 60, 0.05, 15)
         self.AIworld.addAiChar(self.AIchar)
         self.AIbehaviors = self.AIchar.getAiBehaviors()
-        
+
         # the following loads in a "navmesh" .csv file
         # generated using an .egg primitive created on the fly
         # with built-in panda3d functions and some boutique
@@ -142,7 +194,6 @@ class World(ShowBase):
         navmesh = NavMeshGenerator(prim_1_name + ".egg", prim_2_name + ".egg")
         # the navmesh has now been automatically created
         # and we can add it to the PandAI init_path_find()
-        
         self.AIbehaviors.initPathFind("navmesh.csv")
         # self.AIbehaviors.initPathFind("models/navmesh.csv")
 
@@ -153,9 +204,6 @@ class World(ShowBase):
 
         # AI World update
         taskMgr.add(self.AIUpdate, "AIUpdate")
-
-        # Movement task
-        taskMgr.add(self.Mover, "Mover")
 
         slight_1 = Spotlight('slight_1')
         slight_1.setColor(Vec4(Vec3(5),1))
@@ -171,9 +219,38 @@ class World(ShowBase):
         
     def setMove(self):
         # self.AIbehaviors.pathFindTo(LVecBase3(random.randint(-200,200),random.randint(-200,200),0))
-        self.AIbehaviors.pathFindTo(self.pointer)
+        self.AIbehaviors.pathFindTo(self.pointer, "somePath")
         # self.AIbehaviors.seek(self.pointer)
         self.ralph.loop("run")
+
+    def move(self):
+        self.cTrav.traverse(render)
+
+        # adjust ralph's Z coordinate
+        # if ralph's ray hit terrain, update his Z
+        entries = list(self.ralphGroundHandler.entries)
+        entries.sort(key=lambda x: x.getSurfacePoint(render).getZ())
+
+        for entry in entries:
+            # discover what the collision node entry names are if we don't know already
+            # print(entry.getIntoNode().name)
+            if entry.getIntoNode().name == "Plane.001":
+                self.ralph.setZ(entry.getSurfacePoint(render).getZ())
+
+        # keep the camera at one unit above the terrain,
+        # or two units above ralph, whichever is greater.
+        entries = list(self.camGroundHandler.entries)
+        entries.sort(key=lambda x: x.getSurfacePoint(render).getZ())
+
+        for entry in entries:
+            if entry.getIntoNode().name == "terrain":
+                base.camera.setZ(entry.getSurfacePoint(render).getZ() + 1.5)
+        if base.camera.getZ() < self.ralph.getZ() + 2.0:
+            base.camera.setZ(self.ralph.getZ() + 2.0)
+
+        self.ralph.setP(0)
+        
+        return Task.cont
 
     def addBlock(self):
         new_box = loader.loadModel("models/1m_sphere_black_marble.bam")
@@ -189,12 +266,10 @@ class World(ShowBase):
         new_box.reparentTo(render)
         self.AIbehaviors.addStaticObstacle(new_box)
 
-    # To update the AIWorld
+    # update the AIWorld
     def AIUpdate(self, task):
         self.AIworld.update()
-        #if self.AIbehaviors.behaviorStatus("pathfollow") == "done":
-        #    self.ralph.stop("run")
-        #    self.ralph.pose("walk", 0)
+        self.move()
 
         return Task.cont
 
