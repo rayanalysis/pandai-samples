@@ -53,7 +53,7 @@ class World(ShowBase):
         complexpbr.screenspace_init()
         # pandarecord.setup_sg(base,buff_hw=[1280,720],cust_fr=60,RAM_mode=True)
 
-        self.keyMap = {"left": 0, "right": 0, "up": 0, "down": 0}
+        self.keyMap = {"left": 0, "right": 0, "up": 0, "down": 0, "pointerUp": 0, "pointerDown": 0}
 
         addTitle("PandAI Tutorial: Adding Dynamic Obstacles Over Terrain")
         addInstructions(0.95, "[ESC]: Quit")
@@ -76,10 +76,9 @@ class World(ShowBase):
         self.loadModels()
 
         # create built-in collision from loaded model
-        EggPrimitiveCreation.makeCollisionModel("environ_1.bam", 0)
+        EggPrimitiveCreation.makeCollisionModel("environ_1.bam")
 
-        # Movement task
-        self.path_no = 1
+        # movement task
         taskMgr.add(self.Mover, "Mover")
         # taskMgr.add(self.updateRalphZ, "UpdateRalphZ")
         
@@ -108,11 +107,11 @@ class World(ShowBase):
         self.camGroundHandler = CollisionHandlerQueue()
         self.cTrav.addCollider(self.camGroundColNp, self.camGroundHandler)
 
-        # Uncomment this line to see the collision rays
+        # uncomment this line to see the collision rays
         self.ralphGroundColNp.show()
         self.camGroundColNp.show()
        
-        # Uncomment this line to show a visual representation of the 
+        # uncomment this line to show a visual representation of the 
         # collisions occuring
         self.cTrav.showCollisions(render)
 
@@ -120,19 +119,21 @@ class World(ShowBase):
 
     def activateCam(self):
         base.cam.setPosHpr(0,0,0,0,0,0)
-        base.cam.reparentTo(self.ralph)
-        base.cam.setY(base.cam.getY() + 30)
-        base.cam.setZ(base.cam.getZ() + 10)
-        base.cam.setHpr(180,-15,0)
+        # base.cam.reparentTo(self.ralph)
+        # base.cam.setY(base.cam.getY() + 30)
+        # base.cam.setZ(base.cam.getZ() + 10)
+        # base.cam.setHpr(180,-15,0)
 
     def loadModels(self):
         # self.environ = loader.loadModel("models/arena_1.bam")
         # self.environ.setPos(100,100,0)
         # self.environ.reparentTo(render)
-        self.environ = loader.load_model("models/builtin_test.glb")
-        self.environ.write_bam_file("environ_1.bam")
+        self.environ = loader.loadModel("models/builtin_test.glb")
+        self.environ.writeBamFile("environ_1.bam")
+        self.visual_environ = loader.loadModel("environ_1.bam")
+        self.visual_environ.reparentTo(render)
 
-        # Create the main character, Ralph
+        # create the main character, Ralph
         # ralphStartPos = self.environ.find("**/start_point").getPos()
         ralphStartPos = Vec3(20, 20, 0)
 
@@ -144,6 +145,14 @@ class World(ShowBase):
         self.ralph.setScale(2)
         self.ralph.setPos(ralphStartPos)
 
+        self.ralphVis = Actor("models/ralph",
+                           {"run": "models/ralph-run",
+                            "walk": "models/ralph-walk"})
+
+        self.ralphVis.reparentTo(render)
+        self.ralphVis.setScale(2)
+        self.ralphVis.setPos(ralphStartPos)
+
         self.pointer = loader.loadModel("models/1m_sphere_black_marble.bam")
         self.pointer.setColor(1, 0, 0)
         self.pointer.setPos(100, 100, 0)
@@ -151,7 +160,7 @@ class World(ShowBase):
         self.pointer.reparentTo(render)
 
     def setAI(self):
-        # Creating AI World
+        # creating AI World
         self.AIworld = AIWorld(render)
 
         self.accept("enter", self.setMove)
@@ -159,7 +168,7 @@ class World(ShowBase):
         self.accept("2", self.addBigBlock)
         # self.accept("space", self.addStaticObstacle)
 
-        # Movement
+        # movement
         self.accept("arrow_left", self.setKey, ["left", 1])
         self.accept("arrow_right", self.setKey, ["right", 1])
         self.accept("arrow_up", self.setKey, ["up", 1])
@@ -168,6 +177,10 @@ class World(ShowBase):
         self.accept("arrow_right-up", self.setKey, ["right", 0])
         self.accept("arrow_up-up", self.setKey, ["up", 0])
         self.accept("arrow_down-up", self.setKey, ["down", 0])
+        self.accept("u", self.setKey, ["pointerUp", 1])
+        self.accept("u-up", self.setKey, ["pointerUp", 0])
+        self.accept("i", self.setKey, ["pointerDown", 1])
+        self.accept("i-up", self.setKey, ["pointerDown", 0])
 
         self.AIchar = AICharacter("ralph", self.ralph, 60, 0.05, 15)
         self.AIworld.addAiChar(self.AIchar)
@@ -181,10 +194,8 @@ class World(ShowBase):
         prim_2_name = "squares_coll"  # this is a copy of the navmesh primitive
         # we begin by making two meshes, one "Full" and one "Coll"
         # in order to build the 2D navigation mesh from .egg files
-        # primitive_data_1 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Full", 30)
-        # primitive_data_2 = EggPrimitiveCreation.makeWedge(360, 128, 200, "Coll", 30)
         primitive_data_1 = EggPrimitiveCreation.makeSquaresEVPXZ(30, 30, 10, "Full",0)
-        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZ(20, 20, 10, "Coll",0)
+        primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZ(30, 30, 10, "Coll",0)
         # primitive_data_2 = EggPrimitiveCreation.makeSquaresEVPXZSparse(30, 30, 10, "Coll",0)
         primitive_data_1.writeEgg(Filename(prim_1_name + ".egg"))
         primitive_data_2.writeEgg(Filename(prim_2_name + ".egg"))
@@ -221,7 +232,8 @@ class World(ShowBase):
         # self.AIbehaviors.pathFindTo(LVecBase3(random.randint(-200,200),random.randint(-200,200),0))
         self.AIbehaviors.pathFindTo(self.pointer, "somePath")
         # self.AIbehaviors.seek(self.pointer)
-        self.ralph.loop("run")
+        self.ralphVis.loop("run")
+        self.ralph.hide()
 
     def move(self):
         self.cTrav.traverse(render)
@@ -235,7 +247,7 @@ class World(ShowBase):
             # discover what the collision node entry names are if we don't know already
             # print(entry.getIntoNode().name)
             if entry.getIntoNode().name == "Plane.001":
-                self.ralph.setZ(entry.getSurfacePoint(render).getZ())
+                self.ralphVis.setZ(entry.getSurfacePoint(render).getZ())
 
         # keep the camera at one unit above the terrain,
         # or two units above ralph, whichever is greater.
@@ -243,12 +255,16 @@ class World(ShowBase):
         entries.sort(key=lambda x: x.getSurfacePoint(render).getZ())
 
         for entry in entries:
-            if entry.getIntoNode().name == "terrain":
+            if entry.getIntoNode().name == "Plane.001":
                 base.camera.setZ(entry.getSurfacePoint(render).getZ() + 1.5)
-        if base.camera.getZ() < self.ralph.getZ() + 2.0:
-            base.camera.setZ(self.ralph.getZ() + 2.0)
+        if base.camera.getZ() < self.ralphVis.getZ() + 2.0:
+            base.camera.setZ(self.ralphVis.getZ() + 2.0)
 
-        self.ralph.setP(0)
+        # self.ralphVis.setP(0)
+        self.ralphVis.setX(self.ralph.getX())
+        self.ralphVis.setY(self.ralph.getY())
+        self.ralphVis.setH(self.ralph.getH())
+        # print(base.cam.getP())
         
         return Task.cont
 
@@ -278,6 +294,15 @@ class World(ShowBase):
 
     def Mover(self, task):
         startPos = self.pointer.getPos()
+        dt = base.clock.getDt()
+        
+        if self.keyMap["pointerUp"] != 0:
+            startPos.z += 1
+            self.pointer.setPos(startPos + Point3(0, 0, 0))
+
+        if self.keyMap["pointerDown"] != 0:
+            startPos.z -= 1
+            self.pointer.setPos(startPos + Point3(0, 0, 0))
 
         if self.keyMap["left"] != 0:
             self.pointer.setPos(startPos + Point3(-speed, 0, 0))
@@ -293,6 +318,8 @@ class World(ShowBase):
 
         if self.pointer_move is True and self.box != 0:
             self.box.setPos(self.pointer.getPos())
+
+        self.environ.setPos(0,0,0)
 
         return Task.cont
 

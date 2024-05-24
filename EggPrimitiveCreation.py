@@ -10,43 +10,43 @@ def makeCollisionModel(inputModel = "models/arena_1.bam", modelOffset = 0):
     # https://discourse.panda3d.org/t/collision-mesh-from-loaded-model-for-built-in-collision-system/27102
     # load model
     path_to_model = inputModel
-    model_root = base.loader.load_model(path_to_model)
-    model_root.reparent_to(base.render)
+    model_root = base.loader.loadModel(path_to_model)
+    model_root.reparentTo(base.render)
 
     # create a temporary copy to generate the collision meshes from
-    model_copy = model_root.copy_to(base.render)
-    model_copy.detach_node()
+    model_copy = model_root.copyTo(base.render)
+    model_copy.detachNode()
     # "bake" the transformations into the vertices
-    model_copy.flatten_light()
+    model_copy.flattenLight()
 
     # create root node to attach collision nodes to
     collision_root = NodePath("collision_root")
-    collision_root.reparent_to(model_root)
+    collision_root.reparentTo(model_root)
     # offset the collision meshes from the model so they're easier to see
-    collision_root.set_x(modelOffset)
-    collision_root.set_y(modelOffset)
+    collision_root.setX(modelOffset)
+    collision_root.setY(modelOffset)
 
     # create a collision mesh for each of the loaded models
-    for model in model_copy.find_all_matches("**/+GeomNode"):
+    for model in model_copy.findAllMatches("**/+GeomNode"):
         model_node = model.node()
         collision_node = CollisionNode(model_node.name)
-        collision_mesh = collision_root.attach_new_node(collision_node)
+        collision_mesh = collision_root.attachNewNode(collision_node)
         # collision nodes are hidden by default
         collision_mesh.show()
 
-        for geom in model_node.modify_geoms():
+        for geom in model_node.modifyGeoms():
 
-            geom.decompose_in_place()
-            vertex_data = geom.modify_vertex_data()
+            geom.decomposeInPlace()
+            vertex_data = geom.modifyVertexData()
             vertex_data.format = GeomVertexFormat.get_v3()
             view = memoryview(vertex_data.arrays[0]).cast("B").cast("f")
-            index_list = geom.primitives[0].get_vertex_list()
+            index_list = geom.primitives[0].getVertexList()
             index_count = len(index_list)
 
             for indices in (index_list[i:i+3] for i in range(0, index_count, 3)):
                 points = [Point3(*view[index*3:index*3+3]) for index in indices]
                 coll_poly = CollisionPolygon(*points)
-                collision_node.add_solid(coll_poly)
+                collision_node.addSolid(coll_poly)
 
     # model_root.hide()
             
