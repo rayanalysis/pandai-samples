@@ -32,9 +32,9 @@ load_prc_file_data("", """
 """)
 
 
-base = ShowBase()
+ShowBase()
 speed = 0.75
-font = loader.loadFont("cmss12")
+font = base.loader.loadFont("cmss12")
 
 # Function to put instructions on the screen.
 def addInstructions(pos, msg):
@@ -47,7 +47,7 @@ def addTitle(text):
                         pos=(1.3, -0.95), align=TextNode.ARight, scale=.07)
 
 
-class World(ShowBase):
+class World:
     def __init__(self):
         complexpbr.apply_shader(base.render)
         complexpbr.screenspace_init()
@@ -102,20 +102,20 @@ class World(ShowBase):
         # Creating AI World
         self.AIworld = AIWorld(render)
 
-        self.accept("enter", self.setMove)
-        self.accept("1", self.addBlock)
-        self.accept("2", self.addBigBlock)
+        base.accept("enter", self.setMove)
+        base.accept("1", self.addBlock)
+        base.accept("2", self.addBigBlock)
         # self.accept("space", self.addStaticObstacle)
 
         # Movement
-        self.accept("arrow_left", self.setKey, ["left", 1])
-        self.accept("arrow_right", self.setKey, ["right", 1])
-        self.accept("arrow_up", self.setKey, ["up", 1])
-        self.accept("arrow_down", self.setKey, ["down", 1])
-        self.accept("arrow_left-up", self.setKey, ["left", 0])
-        self.accept("arrow_right-up", self.setKey, ["right", 0])
-        self.accept("arrow_up-up", self.setKey, ["up", 0])
-        self.accept("arrow_down-up", self.setKey, ["down", 0])
+        base.accept("arrow_left", self.setKey, ["left", 1])
+        base.accept("arrow_right", self.setKey, ["right", 1])
+        base.accept("arrow_up", self.setKey, ["up", 1])
+        base.accept("arrow_down", self.setKey, ["down", 1])
+        base.accept("arrow_left-up", self.setKey, ["left", 0])
+        base.accept("arrow_right-up", self.setKey, ["right", 0])
+        base.accept("arrow_up-up", self.setKey, ["up", 0])
+        base.accept("arrow_down-up", self.setKey, ["down", 0])
 
         self.AIchar = AICharacter("ralph", self.ralph, 60, 0.05, 15)
         self.AIworld.addAiChar(self.AIchar)
