@@ -9,7 +9,7 @@ Modern panda3d.ai sample programs, showcasing usage of the built-in A* pathfindi
 
 ![screenshot-Sat-Jun-22-18-19-35-2024-5424](https://github.com/rayanalysis/pandai-samples/assets/3117958/967c01b6-04ee-443c-a002-46d722bf92ec)
 
-4/27/2024 Update Screenshots
+04/27/2024 Update Screenshots
 
 ![ralph_over_AI_terrain](https://github.com/rayanalysis/pandai-samples/assets/3117958/0d88719d-1976-4e74-a91f-8d34aee24646)
 

@@ -6,7 +6,7 @@ import sys
  
 class NavMeshGenerator():
     def __init__(self, prim_1_name, prim_2_name):
-        #initialize lists
+
         self.oldList = []
         self.oldCollList = []
         
@@ -50,7 +50,7 @@ class NavMeshGenerator():
         print("Write to csv file...")
         self.writeToCSV()
     
-    # Iterates through the Egg file and
+    # Iterate through the Egg file and
     # extracts all the quads and stores them
     # as nodes
     def iterateEggPoly(self, egg, type): 
@@ -83,7 +83,7 @@ class NavMeshGenerator():
           self.iterateEggPoly(child, type)
           child = egg.getNextChild()
         
-    # Creates a new List which has the correctly
+    # Create a new List which has the correctly
     # ordered nodes for the Full nodes
     def createNewFullList(self):
         # Find the next node based on edge 0-3
@@ -120,7 +120,7 @@ class NavMeshGenerator():
             currentColNode = nextRowNode
 
     
-    # Creates a combined List which has the correctly
+    # Create a combined List which has the correctly
     # ordered nodes with collisions as None           
     def createCombinedGrid(self):
        for r in range(int(sqrt(self.nodeCount))): 
@@ -133,13 +133,13 @@ class NavMeshGenerator():
                 else:
                     self.finalList[r].append(None)
     
-    # Creates neighbor lists for each node
+    # Create neighbor lists for each node
     def createNeighbors(self):
         for r in range(int(sqrt(self.nodeCount))): 
          for c in range(int(sqrt(self.nodeCount))):
             self.setNeighbors(self.finalList[r][c], r, c)
  
-    # Writes the grid in the correct format to the .csv
+    # Write the grid in the correct format to the .csv
     def writeToCSV(self):
         file = open('navmesh.csv', 'wb')
         
