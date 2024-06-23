@@ -186,8 +186,11 @@ class World:
         base.accept("u", self.setKey, ["pointerUp", 1])
         base.accept("u-up", self.setKey, ["pointerUp", 0])
 
-        self.AIchar = AICharacter("ralph", self.ralph, 60, 0.05, 15)
+        # AICharacter() setup is as follows
+        # model_name_string, model_nodepath, mass, movement_force, max_force)
+        self.AIchar = AICharacter("ralph", self.ralph, 60, 0.05, 20)
         self.AIworld.addAiChar(self.AIchar)
+        # self.AIworld.removeAiChar(model_name_string)
         self.AIbehaviors = self.AIchar.getAiBehaviors()
 
         # the following loads in a "navmesh" .csv file
@@ -219,7 +222,7 @@ class World:
 
         # AI World update
         taskMgr.add(self.AIUpdate, "AIUpdate")
-        self.intializeStaticLevelWalls()
+        self.initializeStaticLevelWalls()
 
         slight_1 = Spotlight('slight_1')
         slight_1.setColor(Vec4(Vec3(5),1))
@@ -273,7 +276,7 @@ class World:
         
         return Task.cont
         
-    def intializeStaticLevelWalls(self):
+    def initializeStaticLevelWalls(self):
         new_wall = loader.loadModel("models/wall_test.bam")
         new_wall.setPos(0,0,0)
         new_wall.setScale(10)
