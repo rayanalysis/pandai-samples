@@ -4,7 +4,7 @@ from panda3d.egg import EggPolygon, EggGroup, EggVertexPool, EggData, EggVertex,
 import math
 
 
-def makeCollisionModel(inputModel = "models/arena_1.bam", modelOffset = 0):
+def makeCollisionModel(inputModel, modelOffset = 0):
     # we can utilize a collision mesh generated directly for the built-in collision system
     # to obtain a varying heightfield, adapted from:
     # https://discourse.panda3d.org/t/collision-mesh-from-loaded-model-for-built-in-collision-system/27102

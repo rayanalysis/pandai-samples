@@ -18,9 +18,6 @@ from panda3d.ai import *
 from NavMeshGenerator import *
 import EggPrimitiveCreation
 
-import complexpbr
-# import pandarecord
-
 
 load_prc_file_data("", """
     win-size 1280 720
@@ -49,10 +46,6 @@ def addTitle(text):
 
 class World:
     def __init__(self):
-        complexpbr.apply_shader(render)
-        # complexpbr.screenspace_init()
-        # pandarecord.setup_sg(base,buff_hw=[1280,720],cust_fr=60,RAM_mode=True)
-
         self.keyMap = {"left": 0, "right": 0, "up": 0, "down": 0}
 
         addTitle("PandAI Tutorial: Adding Dynamic Obstacles Over Terrain")
@@ -86,11 +79,10 @@ class World:
         self.aiObstacleList = []
 
         # create built-in collision from loaded model
-        EggPrimitiveCreation.makeCollisionModel("environ_1.bam")
+        EggPrimitiveCreation.makeCollisionModel("models/builtin_test.bam")
         
         # create a box primitive for obstacle placement
-        new_wall = loader.loadModel("models/wall_test.glb")
-        new_wall.writeBamFile("models/wall_test.bam")
+        new_wall = loader.loadModel("models/wall_test.bam")
 
         # movement task
         taskMgr.add(self.Mover, "Mover")
@@ -136,14 +128,6 @@ class World:
         base.cam.lookAt(135,135,-20)
 
     def loadModels(self):
-        # self.environ = loader.loadModel("models/arena_1.bam")
-        # self.environ.setPos(100,100,0)
-        # self.environ.reparentTo(render)
-        self.environ = loader.loadModel("models/builtin_test.glb")
-        self.environ.writeBamFile("environ_1.bam")
-        self.visual_environ = loader.loadModel("environ_1.bam")
-        self.visual_environ.reparentTo(render)
-
         # create the main character, Ralph
         # ralphStartPos = self.environ.find("**/start_point").getPos()
         ralphStartPos = Vec3(20, 20, 0)
@@ -371,8 +355,6 @@ class World:
 
         if self.pointer_move is True and self.box != 0:
             self.box.setPos(self.pointer.getPos())
-
-        self.environ.setPos(0,0,0)
         
         task.delay_time = 0.1
         return Task.again
